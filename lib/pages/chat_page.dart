@@ -10,7 +10,8 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   bool _escribiendo = false;
-  final _textCtrl = TextEditingController;
+  final _textCtrl = TextEditingController();
+  final _focusNode = FocusNode();
   List<ChatMessage> _messages = [
     ChatMessage(
         texto:
@@ -59,7 +60,7 @@ class _ChatPageState extends State<ChatPage> {
             Divider(),
             Container(
               color: Color.fromRGBO(40, 40, 40, 1),
-              child: _inputChat,
+              child: _inputChat(),
             )
           ],
         ),
@@ -73,18 +74,45 @@ class _ChatPageState extends State<ChatPage> {
       child: Row(
         children: [
           Flexible(
-              child: TextField(
-            controller: _textCtrl,
-            onChanged: (texto) {
-              setState(() {
-                texto.trim().length > 0
-                    ? _escribiendo = true
-                    : _escribiendo = false;
-              });
-            },
-          ))
+            child: TextField(
+              controller: _textCtrl,
+              onChanged: (texto) {
+                setState(() {
+                  texto.trim().length > 0
+                      ? _escribiendo = true
+                      : _escribiendo = false;
+                });
+              },
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration.collapsed(
+                hintText: 'Enviar',
+                hintStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: 25,
+                ),
+              ),
+            ),
+          ),
+          Container(
+            child: IconTheme(
+              data: IconThemeData(color: Color.fromRGBO(146, 184, 31, 1)),
+              child: IconButton(
+                icon: Icon(Icons.send_outlined),
+                onPressed:
+                    _escribiendo ? () => _handleSubmit(_textCtrl.text) : null,
+              ),
+            ),
+          )
         ],
       ),
     ));
+  }
+
+  _handleSubmit(String texto) {
+    _focusNode.requestFocus();
+    _textCtrl.clear();
+    final newMessage = ChatMessage(texto: texto, uid: '123');
+    _messages.insert(0, newMessage);
+    setState(() {});
   }
 }

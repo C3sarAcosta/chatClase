@@ -1,8 +1,10 @@
+import 'package:chat/services/auth_services.dart';
 import 'package:chat/widgets/custom_button.dart';
 import 'package:chat/widgets/custom_input.dart';
 import 'package:chat/widgets/custom_label.dart';
 import 'package:chat/widgets/custom_logo.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -68,7 +70,10 @@ class __FormState extends State<_Form> {
           CustomButton(
               texto: 'Ingresar',
               onPressed: () {
-                Navigator.pushReplacementNamed(context, 'usuarios');
+                final authService =
+                    Provider.of<AuthService>(context, listen: false);
+                authService.login(emailCtrl.text, passCtrl.text);
+                //Navigator.pushReplacementNamed(context, 'usuarios');
               })
         ],
       ),
