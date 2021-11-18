@@ -1,3 +1,4 @@
+import 'package:chat/helpers/mostrarAlerta.dart';
 import 'package:chat/services/auth_services.dart';
 import 'package:chat/widgets/custom_button.dart';
 import 'package:chat/widgets/custom_input.dart';
@@ -69,14 +70,22 @@ class __FormState extends State<_Form> {
             isPassword: true,
           ),
           CustomButton(
-              texto: 'Ingresar',
-              onPressed: authService.autenticando
-                  ? () => {}
-                  : () {
-                      FocusScope.of(context).unfocus();
-                      authService.login(emailCtrl.text, passCtrl.text);
+            texto: 'Ingresar',
+            onPressed: authService.autenticando
+                ? () => {}
+                : () async {
+                    FocusScope.of(context).unfocus();
+                    final loginRes =
+                        await authService.login(emailCtrl.text, passCtrl.text);
+                    if (loginRes) {
                       //Navigator.pushReplacementNamed(context, 'usuarios');
-                    })
+                    } else {
+                      //Mostrar alerta
+                      mostrarAlerta(context, 'Error en el login',
+                          'Credemnciales incorrectas');
+                    }
+                  },
+          )
         ],
       ),
     );

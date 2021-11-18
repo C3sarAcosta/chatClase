@@ -16,7 +16,7 @@ class AuthService with ChangeNotifier {
     notifyListeners();
   }
 
-  Future login(String email, String password) async {
+  Future<bool> login(String email, String password) async {
     this.autenticando = true;
     //Payload que mandaremos al backend
     final data = {'email': email, 'password': password};
@@ -27,14 +27,17 @@ class AuthService with ChangeNotifier {
       headers: {'Content-Type': 'application/json'},
     );
 
+    this.autenticando = false;
+    print(resp.body);
+
     //Si la operacion con el servidor es exitosa
     if (resp.statusCode == 200) {
       final loginResponse = loginResponseFromJson(resp.body);
       //almacenamos el usuario autenticado
       this.usuario = loginResponse.usuario;
-
-      this.autenticando = false;
+      return true;
+    } else {
+      return false;
     }
-    print(resp.body);
   }
 }
