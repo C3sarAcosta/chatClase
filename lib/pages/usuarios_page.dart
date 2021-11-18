@@ -15,22 +15,22 @@ class _UsuarioPageState extends State<UsuarioPage> {
       Usuario(
           email: 'cristian.lb@delicias.tecnm.mx',
           nombre: 'Cristian Luevanos',
-          id: '871256381',
+          uid: '871256381',
           online: true),
       Usuario(
           email: 'mariel.bl@delicias.tecnm.mx',
           nombre: 'Mariel Baeza',
-          id: '736547283',
+          uid: '736547283',
           online: false),
       Usuario(
           email: 'jose.cm@delicias.tecnm.mx',
           nombre: 'Jose Chavarria',
-          id: '78213581',
+          uid: '78213581',
           online: false),
       Usuario(
           email: 'Vanessa.bs@delicias.tecnm.mx',
           nombre: 'Vanessa Burrola',
-          id: '5243623',
+          uid: '5243623',
           online: true),
     ];
     return Scaffold(
