@@ -78,7 +78,8 @@ class __FormState extends State<_Form> {
                     final loginRes =
                         await authService.login(emailCtrl.text, passCtrl.text);
                     if (loginRes) {
-                      //Navigator.pushReplacementNamed(context, 'usuarios');
+                      //Navigator.pushNamed(context, 'usuarios');
+                      Navigator.pushReplacementNamed(context, 'usuarios');
                     } else {
                       //Mostrar alerta
                       mostrarAlerta(context, 'Error en el login',
