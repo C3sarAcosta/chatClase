@@ -1,8 +1,11 @@
+import 'package:chat/helpers/mostrarAlerta.dart';
+import 'package:chat/services/auth_services.dart';
 import 'package:chat/widgets/custom_button.dart';
 import 'package:chat/widgets/custom_input.dart';
 import 'package:chat/widgets/custom_label.dart';
 import 'package:chat/widgets/custom_logo.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -48,6 +51,7 @@ class __FormState extends State<_Form> {
   final nombreCtrl = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
     return Column(
       children: [
         CustomInput(
@@ -70,12 +74,25 @@ class __FormState extends State<_Form> {
           isPassword: true,
         ),
         CustomButton(
-            texto: 'Ingresar',
-            onPressed: () {
-              print(emailCtrl.text);
+          texto: 'Registrar',
+          onPressed: authService.autenticando
+              ? () => {}
+              : () async {
+                  /*print(emailCtrl.text);
               print(passCtrl.text);
-              print(nombreCtrl.text);
-            })
+              print(nombreCtrl.text);*/
+                  final registro = await authService.register(
+                    nombreCtrl.text,
+                    emailCtrl.text,
+                    passCtrl.text,
+                  );
+                  if (registro == true) {
+                    Navigator.pushReplacementNamed(context, 'usuarios');
+                  } else {
+                    mostrarAlerta(context, 'Registro Incorrecto', registro);
+                  }
+                },
+        ),
       ],
     );
   }
