@@ -1,5 +1,7 @@
 import 'package:chat/models/usuario.dart';
+import 'package:chat/services/auth_services.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class UsuarioPage extends StatefulWidget {
   const UsuarioPage({Key? key}) : super(key: key);
@@ -33,14 +35,19 @@ class _UsuarioPageState extends State<UsuarioPage> {
           uid: '5243623',
           online: true),
     ];
+    final authService = Provider.of<AuthService>(context);
+    final infoUsuario = authService.usuario;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mis contactos'),
+        title: Text(infoUsuario!.nombre),
         elevation: 1,
         backgroundColor: Color.fromRGBO(40, 40, 40, 1),
         leading: IconButton(
           icon: Icon(Icons.exit_to_app_outlined),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, 'login');
+            AuthService.deleteToken();
+          },
         ),
         actions: [
           Container(
