@@ -86,6 +86,33 @@ class AuthService with ChangeNotifier {
     }
   }
 
+  Future<bool> isLoggedIn() async {
+    //Leer el token
+    final token = await this._storage.read(key: 'token');
+    final uri = Uri.parse('${Environment.apiUrl}/login/renew');
+    final resp = await http.get(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-token': token.toString()
+      },
+    );
+
+    print(resp.body);
+
+    //Si la operacion con el servidor es exitosa
+    if (resp.statusCode == 200) {
+      final loginResponse = loginResponseFromJson(resp.body);
+      //almacenamos el usuario autenticado
+      this.usuario = loginResponse.usuario;
+      await this._guardarToken(loginResponse.token);
+      return true;
+    } else {
+      final respBody = jsonDecode(resp.body);
+      return respBody['msg'];
+    }
+  }
+
   Future _guardarToken(String token) async {
     //Escribimos el valor del token
     return await _storage.write(key: 'token', value: token);
