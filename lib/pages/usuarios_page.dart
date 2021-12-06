@@ -54,12 +54,11 @@ class _UsuarioPageState extends State<UsuarioPage> {
         ),
         actions: [
           Container(
-            padding: EdgeInsets.only(right: 20),
-            child: Icon(
-              Icons.circle_rounded,
-              color: Color.fromRGBO(146, 184, 31, 1),
-            ),
-          )
+              padding: EdgeInsets.only(right: 20),
+              child: (socketService.serverStatus == ServerStatus.Online)
+                  ? Icon(Icons.circle_rounded,
+                      color: Color.fromRGBO(146, 184, 31, 1))
+                  : Icon(Icons.circle_rounded, color: Colors.red))
         ],
       ),
       body: ListView.separated(
