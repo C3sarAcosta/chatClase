@@ -1,5 +1,6 @@
 import 'package:chat/helpers/mostrarAlerta.dart';
 import 'package:chat/services/auth_services.dart';
+import 'package:chat/services/socket_service.dart';
 import 'package:chat/widgets/custom_button.dart';
 import 'package:chat/widgets/custom_input.dart';
 import 'package:chat/widgets/custom_label.dart';
@@ -52,6 +53,7 @@ class __FormState extends State<_Form> {
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
+    final socketService = Provider.of<SocketService>(context);
     return Column(
       children: [
         CustomInput(
@@ -87,6 +89,7 @@ class __FormState extends State<_Form> {
                     passCtrl.text,
                   );
                   if (registro == true) {
+                    socketService.connect();
                     Navigator.pushReplacementNamed(context, 'usuarios');
                   } else {
                     mostrarAlerta(context, 'Registro Incorrecto', registro);

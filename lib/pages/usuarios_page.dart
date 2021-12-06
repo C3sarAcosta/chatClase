@@ -1,5 +1,6 @@
 import 'package:chat/models/usuario.dart';
 import 'package:chat/services/auth_services.dart';
+import 'package:chat/services/socket_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -36,15 +37,17 @@ class _UsuarioPageState extends State<UsuarioPage> {
           online: true),
     ];
     final authService = Provider.of<AuthService>(context);
+    final socketService = Provider.of<SocketService>(context);
     final infoUsuario = authService.usuario;
     return Scaffold(
       appBar: AppBar(
-        title: Text(infoUsuario!.nombre),
+        //title: Text(infoUsuario!.nombre),
         elevation: 1,
         backgroundColor: Color.fromRGBO(40, 40, 40, 1),
         leading: IconButton(
           icon: Icon(Icons.exit_to_app_outlined),
           onPressed: () {
+            socketService.disconnect();
             Navigator.pushReplacementNamed(context, 'login');
             AuthService.deleteToken();
           },
