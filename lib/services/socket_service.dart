@@ -20,7 +20,8 @@ class SocketService with ChangeNotifier {
     this._socket = IO.io(Environment.socketUrl, {
       'transports': ['websocket'],
       'autoConnect': true,
-      'forceNew': true
+      'forceNew': true,
+      'extraHeaders': {'x-token': token}
     });
 
     this._socket.on('connect', (_) {

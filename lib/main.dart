@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Messenger',
-        initialRoute: 'usuarios',
+        initialRoute: 'login',
         routes: appRoutes,
       ),
     );
