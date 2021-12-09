@@ -12,36 +12,36 @@ class UsuarioPage extends StatefulWidget {
 }
 
 class _UsuarioPageState extends State<UsuarioPage> {
+  final usuarios = [
+    Usuario(
+        email: 'cristian.lb@delicias.tecnm.mx',
+        nombre: 'Cristian Luevanos',
+        uid: '871256381',
+        online: true),
+    Usuario(
+        email: 'mariel.bl@delicias.tecnm.mx',
+        nombre: 'Mariel Baeza',
+        uid: '736547283',
+        online: false),
+    Usuario(
+        email: 'jose.cm@delicias.tecnm.mx',
+        nombre: 'Jose Chavarria',
+        uid: '78213581',
+        online: false),
+    Usuario(
+        email: 'Vanessa.bs@delicias.tecnm.mx',
+        nombre: 'Vanessa Burrola',
+        uid: '5243623',
+        online: true),
+  ];
   @override
   Widget build(BuildContext context) {
-    final usuario = [
-      Usuario(
-          email: 'cristian.lb@delicias.tecnm.mx',
-          nombre: 'Cristian Luevanos',
-          uid: '871256381',
-          online: true),
-      Usuario(
-          email: 'mariel.bl@delicias.tecnm.mx',
-          nombre: 'Mariel Baeza',
-          uid: '736547283',
-          online: false),
-      Usuario(
-          email: 'jose.cm@delicias.tecnm.mx',
-          nombre: 'Jose Chavarria',
-          uid: '78213581',
-          online: false),
-      Usuario(
-          email: 'Vanessa.bs@delicias.tecnm.mx',
-          nombre: 'Vanessa Burrola',
-          uid: '5243623',
-          online: true),
-    ];
     final authService = Provider.of<AuthService>(context);
     final socketService = Provider.of<SocketService>(context);
     final infoUsuario = authService.usuario;
     return Scaffold(
       appBar: AppBar(
-        //title: Text(infoUsuario!.nombre),
+        title: Text(infoUsuario!.nombre),
         elevation: 1,
         backgroundColor: Color.fromRGBO(40, 40, 40, 1),
         leading: IconButton(
@@ -64,17 +64,17 @@ class _UsuarioPageState extends State<UsuarioPage> {
       body: ListView.separated(
         physics: BouncingScrollPhysics(),
         itemBuilder: (_, i) => ListTile(
-          title: Text(usuario[i].nombre),
+          title: Text(usuarios[i].nombre),
           leading: CircleAvatar(
             child: Text(
-              usuario[i].nombre.substring(0, 2),
+              usuarios[i].nombre.substring(0, 2),
             ),
           ),
           trailing: Container(
             width: 13,
             height: 13,
             decoration: BoxDecoration(
-              color: usuario[i].online
+              color: usuarios[i].online
                   ? Color.fromRGBO(146, 184, 31, 1)
                   : Colors.red,
               borderRadius: BorderRadius.circular(100),
@@ -82,7 +82,7 @@ class _UsuarioPageState extends State<UsuarioPage> {
           ),
         ),
         separatorBuilder: (_, i) => Divider(),
-        itemCount: usuario.length,
+        itemCount: usuarios.length,
       ),
     );
   }

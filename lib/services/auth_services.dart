@@ -47,9 +47,9 @@ class AuthService with ChangeNotifier {
     //Si la operacion con el servidor es exitosa
     if (resp.statusCode == 200) {
       final loginResponse = loginResponseFromJson(resp.body);
+      this.usuario = loginResponse.usuario;
       await this._guardarToken(loginResponse.token);
       //almacenamos el usuario autenticado
-      this.usuario = loginResponse.usuario;
       return true;
     } else {
       return false;
@@ -108,8 +108,10 @@ class AuthService with ChangeNotifier {
       await this._guardarToken(loginResponse.token);
       return true;
     } else {
-      final respBody = jsonDecode(resp.body);
-      return respBody['msg'];
+      //final respBody = jsonDecode(resp.body);
+      //return respBody['msg'];
+      this.logout();
+      return false;
     }
   }
 
