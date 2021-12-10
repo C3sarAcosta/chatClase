@@ -1,8 +1,10 @@
 import 'package:chat/models/usuario.dart';
 import 'package:chat/services/auth_services.dart';
 import 'package:chat/services/socket_service.dart';
+import 'package:chat/services/usuarios_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class UsuarioPage extends StatefulWidget {
   const UsuarioPage({Key? key}) : super(key: key);
@@ -12,78 +14,93 @@ class UsuarioPage extends StatefulWidget {
 }
 
 class _UsuarioPageState extends State<UsuarioPage> {
-  final usuarios = [
-    Usuario(
-        email: 'cristian.lb@delicias.tecnm.mx',
-        nombre: 'Cristian Luevanos',
-        uid: '871256381',
-        online: true),
-    Usuario(
-        email: 'mariel.bl@delicias.tecnm.mx',
-        nombre: 'Mariel Baeza',
-        uid: '736547283',
-        online: false),
-    Usuario(
-        email: 'jose.cm@delicias.tecnm.mx',
-        nombre: 'Jose Chavarria',
-        uid: '78213581',
-        online: false),
-    Usuario(
-        email: 'Vanessa.bs@delicias.tecnm.mx',
-        nombre: 'Vanessa Burrola',
-        uid: '5243623',
-        online: true),
-  ];
+  final _refreshController = RefreshController(initialRefresh: false);
+  final usuariosService = new UsuariosService();
+  TextStyle styleTexto = TextStyle(color: Colors.black);
+  List<Usuario> usuarios = [];
+
+  @override
+  void initState() {
+    this._cargarUsuarios();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
     final socketService = Provider.of<SocketService>(context);
     final infoUsuario = authService.usuario;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(infoUsuario!.nombre),
-        elevation: 1,
-        backgroundColor: Color.fromRGBO(40, 40, 40, 1),
-        leading: IconButton(
-          icon: Icon(Icons.exit_to_app_outlined),
-          onPressed: () {
-            socketService.disconnect();
-            Navigator.pushReplacementNamed(context, 'login');
-            AuthService.deleteToken();
-          },
+        appBar: AppBar(
+          //title: Text(infoUsuario!.nombre),
+          elevation: 1,
+          backgroundColor: Color.fromRGBO(40, 40, 40, 1),
+          leading: IconButton(
+            icon: Icon(Icons.exit_to_app_outlined),
+            onPressed: () {
+              socketService.disconnect();
+              Navigator.pushReplacementNamed(context, 'login');
+              AuthService.deleteToken();
+            },
+          ),
+          actions: [
+            Container(
+                padding: EdgeInsets.only(right: 20),
+                child: (socketService.serverStatus == ServerStatus.Online)
+                    ? Icon(Icons.circle_rounded,
+                        color: Color.fromRGBO(146, 184, 31, 1))
+                    : Icon(Icons.circle_rounded, color: Colors.red))
+          ],
         ),
-        actions: [
-          Container(
-              padding: EdgeInsets.only(right: 20),
-              child: (socketService.serverStatus == ServerStatus.Online)
-                  ? Icon(Icons.circle_rounded,
-                      color: Color.fromRGBO(146, 184, 31, 1))
-                  : Icon(Icons.circle_rounded, color: Colors.red))
-        ],
+        body: Container(
+          color: Color.fromRGBO(40, 40, 40, 1),
+          child: SmartRefresher(
+            controller: _refreshController,
+            child: _listViewUsuarios(),
+            enablePullDown: true,
+            header: WaterDropHeader(
+              complete: Icon(
+                Icons.check_outlined,
+                color: Color.fromRGBO(146, 184, 31, 1),
+              ),
+              waterDropColor: Color.fromRGBO(146, 184, 31, 1),
+            ),
+            onRefresh: _cargarUsuarios,
+          ),
+        ));
+  }
+
+  ListView _listViewUsuarios() {
+    return ListView.separated(
+      itemBuilder: (_, i) => _usuarioListTile(usuarios[i]),
+      separatorBuilder: (_, i) => Divider(),
+      itemCount: usuarios.length,
+    );
+  }
+
+  ListTile _usuarioListTile(Usuario usuario) {
+    return ListTile(
+      title: Text(usuario.nombre, style: styleTexto),
+      subtitle: Text(usuario.email, style: styleTexto),
+      leading: CircleAvatar(
+        child: Text(
+          usuario.nombre.substring(0, 2),
+          style: styleTexto,
+        ),
       ),
-      body: ListView.separated(
-        physics: BouncingScrollPhysics(),
-        itemBuilder: (_, i) => ListTile(
-          title: Text(usuarios[i].nombre),
-          leading: CircleAvatar(
-            child: Text(
-              usuarios[i].nombre.substring(0, 2),
-            ),
-          ),
-          trailing: Container(
-            width: 13,
-            height: 13,
-            decoration: BoxDecoration(
-              color: usuarios[i].online
-                  ? Color.fromRGBO(146, 184, 31, 1)
-                  : Colors.red,
-              borderRadius: BorderRadius.circular(100),
-            ),
-          ),
-        ),
-        separatorBuilder: (_, i) => Divider(),
-        itemCount: usuarios.length,
+      trailing: Container(
+        width: 12,
+        height: 12,
+        decoration: BoxDecoration(
+            color:
+                usuario.online ? Color.fromRGBO(146, 184, 31, 1) : Colors.red,
+            borderRadius: BorderRadius.circular(100)),
       ),
     );
+  }
+
+  _cargarUsuarios() async {
+    this.usuarios = await usuariosService.getUsuarios();
+    setState(() {});
   }
 }
