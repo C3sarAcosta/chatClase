@@ -28,46 +28,47 @@ class _UsuarioPageState extends State<UsuarioPage> {
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
-    final socketService = Provider.of<SocketService>(context);
+    final socketService = Provider.of<SocketService>(context, listen: true);
     final infoUsuario = authService.usuario;
     return Scaffold(
-        appBar: AppBar(
-          title: Text(infoUsuario!.nombre),
-          elevation: 1,
-          backgroundColor: Color.fromRGBO(40, 40, 40, 1),
-          leading: IconButton(
-            icon: Icon(Icons.exit_to_app_outlined),
-            onPressed: () {
-              socketService.disconnect();
-              Navigator.pushReplacementNamed(context, 'login');
-              AuthService.deleteToken();
-            },
-          ),
-          actions: [
-            Container(
-                padding: EdgeInsets.only(right: 20),
-                child: (socketService.serverStatus == ServerStatus.Online)
-                    ? Icon(Icons.circle_rounded,
-                        color: Color.fromRGBO(146, 184, 31, 1))
-                    : Icon(Icons.circle_rounded, color: Colors.red))
-          ],
+      appBar: AppBar(
+        title: Text(infoUsuario!.nombre),
+        elevation: 1,
+        backgroundColor: Color.fromRGBO(40, 40, 40, 1),
+        leading: IconButton(
+          icon: Icon(Icons.exit_to_app_outlined),
+          onPressed: () {
+            socketService.disconnect();
+            Navigator.pushReplacementNamed(context, 'login');
+            AuthService.deleteToken();
+          },
         ),
-        body: Container(
-          color: Color.fromRGBO(40, 40, 40, 1),
-          child: SmartRefresher(
-            controller: _refreshController,
-            child: _listViewUsuarios(),
-            enablePullDown: true,
-            header: WaterDropHeader(
-              complete: Icon(
-                Icons.check_outlined,
-                color: Color.fromRGBO(146, 184, 31, 1),
-              ),
-              waterDropColor: Color.fromRGBO(146, 184, 31, 1),
+        actions: [
+          Container(
+              padding: EdgeInsets.only(right: 20),
+              child: (socketService.serverStatus == ServerStatus.Online)
+                  ? Icon(Icons.circle_rounded,
+                      color: Color.fromRGBO(146, 184, 31, 1))
+                  : Icon(Icons.circle_rounded, color: Colors.red))
+        ],
+      ),
+      body: Container(
+        color: Color.fromRGBO(40, 40, 40, 1),
+        child: SmartRefresher(
+          controller: _refreshController,
+          child: _listViewUsuarios(),
+          enablePullDown: true,
+          header: WaterDropHeader(
+            complete: Icon(
+              Icons.check_outlined,
+              color: Color.fromRGBO(146, 184, 31, 1),
             ),
-            onRefresh: _cargarUsuarios,
+            waterDropColor: Color.fromRGBO(146, 184, 31, 1),
           ),
-        ));
+          onRefresh: _cargarUsuarios,
+        ),
+      ),
+    );
   }
 
   ListView _listViewUsuarios() {
@@ -102,5 +103,6 @@ class _UsuarioPageState extends State<UsuarioPage> {
   _cargarUsuarios() async {
     this.usuarios = await usuariosService.getUsuarios();
     setState(() {});
+    _refreshController.refreshCompleted();
   }
 }
