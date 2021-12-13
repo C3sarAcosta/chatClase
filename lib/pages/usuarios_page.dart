@@ -32,7 +32,7 @@ class _UsuarioPageState extends State<UsuarioPage> {
     final infoUsuario = authService.usuario;
     return Scaffold(
         appBar: AppBar(
-          //title: Text(infoUsuario!.nombre),
+          title: Text(infoUsuario!.nombre),
           elevation: 1,
           backgroundColor: Color.fromRGBO(40, 40, 40, 1),
           leading: IconButton(
