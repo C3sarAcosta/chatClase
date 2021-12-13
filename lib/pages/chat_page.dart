@@ -1,5 +1,10 @@
+import 'package:chat/models/usuario.dart';
+import 'package:chat/services/auth_services.dart';
+import 'package:chat/services/chat_service.dart';
+import 'package:chat/services/socket_service.dart';
 import 'package:chat/widgets/chat_message.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key}) : super(key: key);
@@ -12,36 +17,44 @@ class _ChatPageState extends State<ChatPage> {
   bool _escribiendo = false;
   final _textCtrl = TextEditingController();
   final _focusNode = FocusNode();
-  List<ChatMessage> _messages = [
-    ChatMessage(
-        texto:
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris volutpat, arcu eu feugiat interdum, sem lacus laoreet leo, mollis pellentesque mi nisl at sapien.',
-        uid: '123'),
-    ChatMessage(
-        texto:
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris volutpat, arcu eu feugiat interdum, sem lacus laoreet leo, mollis pellentesque mi nisl at sapien.',
-        uid: '6353'),
-    ChatMessage(
-        texto:
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris volutpat, arcu eu feugiat interdum, sem lacus laoreet leo, mollis pellentesque mi nisl at sapien.',
-        uid: '6353'),
-    ChatMessage(
-        texto:
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris volutpat, arcu eu feugiat interdum, sem lacus laoreet leo, mollis pellentesque mi nisl at sapien.',
-        uid: '123'),
-  ];
+  late ChatService chatService;
+  late SocketService socketService;
+  late AuthService authService;
+  List<ChatMessage> _messages = [];
+  @override
+  void initState() {
+    super.initState();
+    this.chatService = Provider.of<ChatService>(context, listen: false);
+    this.socketService = Provider.of<SocketService>(context, listen: false);
+    this.authService = Provider.of<AuthService>(context, listen: false);
+    this.socketService.socket.on('mensaje-personal', _escucharMensaje);
+  }
+
+  void _escucharMensaje(dynamic payload) {
+    print(payload['mensaje']);
+    ChatMessage message =
+        new ChatMessage(texto: payload['mensaje'], uid: payload['de']);
+    setState(() {
+      _messages.insert(0, message);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final chatService = Provider.of<ChatService>(context, listen: true);
+    final usuarioDestino = chatService.usuarioDestino;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromRGBO(40, 40, 40, 1),
         title: Row(
           children: [
             CircleAvatar(
-              child: Text('JC'),
-            ),
+                child: Text(
+              usuarioDestino!.nombre.substring(0, 2),
+              style: TextStyle(fontSize: 12, color: Colors.white),
+            )),
             SizedBox(width: 30),
-            Text('Jose Chavarria')
+            Text(usuarioDestino.nombre)
           ],
         ),
       ),
@@ -113,6 +126,18 @@ class _ChatPageState extends State<ChatPage> {
     _textCtrl.clear();
     final newMessage = ChatMessage(texto: texto, uid: '123');
     _messages.insert(0, newMessage);
-    setState(() {});
+    setState(() {
+      this.socketService.emit('mensaje-personal', {
+        'de': this.authService.usuario!.uid,
+        'para': this.chatService.usuarioDestino!.uid,
+        'mensaje': texto
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    this.socketService.socket.off('mensaje-personal');
+    super.dispose();
   }
 }

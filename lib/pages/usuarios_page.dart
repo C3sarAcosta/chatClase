@@ -1,5 +1,6 @@
 import 'package:chat/models/usuario.dart';
 import 'package:chat/services/auth_services.dart';
+import 'package:chat/services/chat_service.dart';
 import 'package:chat/services/socket_service.dart';
 import 'package:chat/services/usuarios_service.dart';
 import 'package:flutter/material.dart';
@@ -97,6 +98,11 @@ class _UsuarioPageState extends State<UsuarioPage> {
                 usuario.online ? Color.fromRGBO(146, 184, 31, 1) : Colors.red,
             borderRadius: BorderRadius.circular(100)),
       ),
+      onTap: () {
+        final chatService = Provider.of<ChatService>(context, listen: false);
+        chatService.usuarioDestino = usuario;
+        Navigator.pushNamed(context, 'chat');
+      },
     );
   }
 
