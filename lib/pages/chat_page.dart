@@ -1,4 +1,4 @@
-import 'package:chat/models/usuario.dart';
+import 'package:chat/models/mensajes_response.dart';
 import 'package:chat/services/auth_services.dart';
 import 'package:chat/services/chat_service.dart';
 import 'package:chat/services/socket_service.dart';
@@ -28,6 +28,15 @@ class _ChatPageState extends State<ChatPage> {
     this.socketService = Provider.of<SocketService>(context, listen: false);
     this.authService = Provider.of<AuthService>(context, listen: false);
     this.socketService.socket.on('mensaje-personal', _escucharMensaje);
+    _cargarHistorial(this.chatService.usuarioDestino!.uid);
+  }
+
+  void _cargarHistorial(String usuarioId) async {
+    List<Mensaje> chat = await this.chatService.getChat(usuarioId);
+    final historial = chat.map((e) => ChatMessage(texto: e.mensaje, uid: e.de));
+    setState(() {
+      _messages.insertAll(0, historial);
+    });
   }
 
   void _escucharMensaje(dynamic payload) {
@@ -124,7 +133,7 @@ class _ChatPageState extends State<ChatPage> {
   _handleSubmit(String texto) {
     _focusNode.requestFocus();
     _textCtrl.clear();
-    final newMessage = ChatMessage(texto: texto, uid: '123');
+    final newMessage = ChatMessage(texto: texto, uid: authService.usuario!.uid);
     _messages.insert(0, newMessage);
     setState(() {
       this.socketService.emit('mensaje-personal', {
